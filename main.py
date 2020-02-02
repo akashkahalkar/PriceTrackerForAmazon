@@ -42,7 +42,7 @@ def CheckPrice(url, price):
 
     #Converting the string to integer
     product_price = int(float(product_price))
-
+    print("-----------------------------------------------")
     print("The Product Name is:" ,product_title)
     print("The Price is:" ,product_price)
 
@@ -58,11 +58,10 @@ def CheckPrice(url, price):
         
         #update configuration file for updated changes
         updateConfigurationFile(items, settings, product_price, url)
-        print(items)
         print(notificationString)
         notify.send(notificationString)
     else:
-        notificationString = "😴 No price change for item: " + product_title[0:15]
+        notificationString = "😴 No price change for item: " + product_title[0:15] + " " + str(product_price)
         print(notificationString)
         notify.send(notificationString)
 
