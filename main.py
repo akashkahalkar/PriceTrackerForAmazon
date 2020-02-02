@@ -6,12 +6,12 @@ import json
 
 with open('products.json','r') as file:
     settings = json.load(file)
+    file.close()
 
 #get configuration parameters
 items = settings['items']
 repeateTime = settings['repeat_after']
 notificationChanel = settings['notification_channel']
-file.close()
 
 #to get notification, open given link and click on subscribe
 notify = Notify(endpoint=notificationChanel)
@@ -49,13 +49,33 @@ def CheckPrice(url, price):
     ##need logic to exit loop if all products have been checked
     # checking the price
     if(product_price != price):
-        notificationString = "🥶 Price changed for item" + product_title[0:20] + "to " + str(product_price)
+        changeType = ""
+        if product_price > price:
+            changeType = " increased"
+        else:
+            changeType = " decreased"
+        notificationString = "🥶 Price changed for item: " + product_title[0:20] + changeType +" to " + str(product_price)
+        
+        #update configuration file for updated changes
+        updateConfigurationFile(items, settings, product_price, url)
+        print(items)
         print(notificationString)
         notify.send(notificationString)
     else:
-        notificationString = "😴 No price change" + product_title[0:15]
+        notificationString = "😴 No price change for item: " + product_title[0:15]
         print(notificationString)
         notify.send(notificationString)
+
+def updateConfigurationFile(items, settings, updatedPrice, url):
+      #write updated values to products
+        for item in items:
+            if item['url'] == url:
+                item['budget'] = updatedPrice
+        settings['items'] = items
+        with open('products.json', 'w+') as outFile:
+            json.dump(settings, outFile, indent=4)
+            outFile.close()
+
 
 while True:
     for product in items:
