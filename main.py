@@ -13,6 +13,10 @@ items = settings['items']
 repeateTime = settings['repeat_after']
 notificationChanel = settings['notification_channel']
 
+if items is None:
+    print("No product urls found.")
+    exit
+
 #to get notification, open given link and click on subscribe
 notify = Notify(endpoint=notificationChanel)
 
