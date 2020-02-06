@@ -12,6 +12,7 @@ with open('products.json','r') as file:
 items = settings['items']
 repeateTime = settings['repeat_after']
 notificationChanel = settings['notification_channel']
+userAgetString = settings['userAgent']
 
 if items is None:
     print("No product urls found.")
@@ -20,15 +21,18 @@ if items is None:
 #to get notification, open given link and click on subscribe
 notify = Notify(endpoint=notificationChanel)
 
-# Currency Symbols to substract it from our string
-currency_symbols = ['€', '£', '$', '¥', '₹', '¥', ',']
-
 # Google "My User Agent" And Replace It
-headers = {"User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'} 
+headers = {"User-Agent": userAgetString} 
 cookies = {}
 
 def CheckPrice(url, price):
-    page = requests.get(url, headers=headers, cookies=cookies)
+    try:
+        page = requests.get(url, headers=headers, cookies=cookies)
+    except requests.ConnectionError as e:
+        print(e)
+        exit 
+   # handle the exception
+    
     soup = BeautifulSoup(page.content, 'html.parser')
     #Finding the elements
     if soup.find(id= "productTitle") != None:
@@ -36,36 +40,34 @@ def CheckPrice(url, price):
     else:
         return
     if  soup.find (id= "priceblock_ourprice") != None:
-        product_price = soup.find (id= "priceblock_ourprice").get_text()
+        product_price = soup.find (id= "priceblock_ourprice").get_text().strip()
     else:
         return
-
-    # using replace() to remove currency symbols
-    for i in currency_symbols: 
-        product_price = product_price.replace(i, '')
+    
+    productPriceString = ''.join(i for i in product_price if i.isdigit() or i == '.')
 
     #Converting the string to integer
-    product_price = int(float(product_price))
+    product_price = float(productPriceString)
     print("-----------------------------------------------")
     print("The Product Name is:" ,product_title)
     print("The Price is:" ,product_price)
 
     ##need logic to exit loop if all products have been checked
     # checking the price
-    if(product_price != price):
+    if(product_price != float(price)):
         changeType = ""
         if product_price > price:
             changeType = " increased"
         else:
             changeType = " decreased"
-        notificationString = "🥶 Price changed for item: " + product_title[0:20] + changeType +" to " + str(product_price)
+        notificationString = "🥶 item: " + product_title[0:20] + changeType +" to: " + str(product_price)
         
         #update configuration file for updated changes
         updateConfigurationFile(items, settings, product_price, url)
         print(notificationString)
         notify.send(notificationString)
     else:
-        notificationString = "😴 No price change for item: " + product_title[0:15] + " " + str(product_price)
+        notificationString = "😴 item: " + product_title[0:20] + ": " + str(product_price)
         print(notificationString)
         notify.send(notificationString)
 
