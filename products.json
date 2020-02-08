@@ -1,11 +1,11 @@
 {
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
     "notification_channel": "https://notify.run/zelA1k5Z91NG8YYx",
     "repeat_after": 10800,
     "items": [
         {
             "url": "https://www.amazon.in/Western-Digital-240GB-Internal-WDS240G2G0B/dp/B078WYS5K6/",
-            "budget": 2715.00
+            "budget": 2715.0
         }
     ]
 }

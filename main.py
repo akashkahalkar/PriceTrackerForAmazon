@@ -13,13 +13,12 @@ items = settings['items']
 repeateTime = settings['repeat_after']
 notificationChanel = settings['notification_channel']
 userAgetString = settings['userAgent']
+#to get notification, open given link and click on subscribe
+notify = Notify(endpoint=notificationChanel)
 
 if items is None:
     print("No product urls found.")
-    exit
-
-#to get notification, open given link and click on subscribe
-notify = Notify(endpoint=notificationChanel)
+    exit(0)
 
 # Google "My User Agent" And Replace It
 headers = {"User-Agent": userAgetString} 
@@ -28,13 +27,11 @@ cookies = {}
 def CheckPrice(url, price):
     try:
         page = requests.get(url, headers=headers, cookies=cookies)
-    except requests.ConnectionError as e:
-        print(e)
-        exit 
-   # handle the exception
-    
+    except requests.ConnectionError:
+        print("🥵 Error occured!!! please check User agent string and Internet connectivity 🧐")
+        exit(0)
     soup = BeautifulSoup(page.content, 'html.parser')
-    #Finding the elements
+        #Finding the elements
     if soup.find(id= "productTitle") != None:
         product_title = soup.find(id= "productTitle").get_text().strip() #strip() to remove special characters
     else:
@@ -55,22 +52,22 @@ def CheckPrice(url, price):
 
     ##need logic to exit loop if all products have been checked
     # checking the price
-    if(product_price != float(price)):
-        changeType = ""
-        if product_price > price:
-            changeType = " increased"
-        else:
-            changeType = " decreased"
-        notificationString = "🥶 item: " + product_title[0:20] + changeType +" to: " + str(product_price)
-        
+
+    if price != 0 and product_price != float(price):
+        percentage = percentageOfDifference(price, product_price)
+        change = getDifference(percentage)
+        notificationString = "🥶 ["+ str(product_price)+ "] Price for item: "+product_title[0:20]+ " "+ change+" by "+str(percentage)+"%"
         #update configuration file for updated changes
         updateConfigurationFile(items, settings, product_price, url)
         print(notificationString)
-        notify.send(notificationString)
     else:
-        notificationString = "😴 item: " + product_title[0:20] + ": " + str(product_price)
+        #initial case when price was no set in configuration
+        if price == 0:
+            updateConfigurationFile(items, settings, product_price, url)
+        notificationString = "😴 item: " + product_title[0:20] + ", price" + str(product_price)
         print(notificationString)
-        notify.send(notificationString)
+    notify.send(notificationString)
+   # handle the exception
 
 def updateConfigurationFile(items, settings, updatedPrice, url):
       #write updated values to products
@@ -82,11 +79,18 @@ def updateConfigurationFile(items, settings, updatedPrice, url):
             json.dump(settings, outFile, indent=4)
             outFile.close()
 
+def percentageOfDifference(original, changed):
+    percentage = int(((changed - original)/original) * 100)
+    return percentage
+
+def getDifference(percentage):
+    return "increased" if percentage > 0 else "decreased"
+
 
 while True:
     for product in items:
         product_url = product['url']
-        product_price = product['budget']
+        product_price = float(product['budget'])
         CheckPrice(product_url, product_price)
     #set repeat time for script specified in seconds
     time.sleep(repeateTime)
