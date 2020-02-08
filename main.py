@@ -44,6 +44,7 @@ def CheckPrice(url, price):
     else:
         return
     
+    #remove currency symbols
     productPriceString = ''.join(i for i in product_price if i.isdigit() or i == '.')
 
     #Converting the string to integer
