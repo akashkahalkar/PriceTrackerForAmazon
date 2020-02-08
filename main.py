@@ -56,7 +56,7 @@ def CheckPrice(url, price):
     if price != 0 and product_price != float(price):
         percentage = percentageOfDifference(price, product_price)
         change = getDifference(percentage)
-        notificationString = "🥶 ["+ str(product_price)+ "] Price for item: "+product_title[0:20]+ " "+ change+" by "+str(percentage)+"%"
+        notificationString = "[🤩]["+ str(product_price)+ "] Price for item: "+product_title[0:30]+ " "+ change+" by "+str(percentage)+"%"
         #update configuration file for updated changes
         updateConfigurationFile(items, settings, product_price, url)
         print(notificationString)
@@ -64,7 +64,7 @@ def CheckPrice(url, price):
         #initial case when price was no set in configuration
         if price == 0:
             updateConfigurationFile(items, settings, product_price, url)
-        notificationString = "😴 item: " + product_title[0:20] + ", price" + str(product_price)
+        notificationString = "[😴] 🎁: " + product_title[0:30] + ", 💰: " + str(product_price)
         print(notificationString)
     notify.send(notificationString)
    # handle the exception
