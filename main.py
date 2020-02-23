@@ -4,16 +4,17 @@ from notify_run import Notify #pip install notify_run
 import time
 import json
 
+#getting config parameter from 'products.json' file
 with open('products.json','r') as file:
     settings = json.load(file)
     file.close()
 
 #get configuration parameters
-items = settings['items']
-repeateTime = settings['repeat_after']
-notificationChanel = settings['notification_channel']
-userAgetString = settings['userAgent']
-#to get notification, open given link and click on subscribe
+items = settings['items'] #list of items
+repeateTime = settings['repeat_after'] #ping time
+notificationChanel = settings['notification_channel'] #notification channel
+userAgetString = settings['user_agent'] #useragent string
+#creating notification object with created notification channel.
 notify = Notify(endpoint=notificationChanel)
 
 if items is None:
@@ -86,11 +87,10 @@ def percentageOfDifference(original, changed):
 def getDifference(percentage):
     return "increased" if percentage > 0 else "decreased"
 
-
 while True:
     for product in items:
         product_url = product['url']
-        product_price = float(product['budget'])
+        product_price = float(product['price'])
         CheckPrice(product_url, product_price)
     #set repeat time for script specified in seconds
     time.sleep(repeateTime)
